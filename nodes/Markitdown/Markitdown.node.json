@@ -1,0 +1,13 @@
+{
+	"node": "n8n-nodes-custom.Markitdown",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Custom Nodes"],
+	"resources": {
+		"primaryDocumentation": []
+	},
+	"alias": ["Binary", "File", "Text", "Open", "Import", "Save", "Export", "Disk", "Transfer"],
+	"subcategories": {
+		"Core Nodes": ["Files"]
+	}
+}

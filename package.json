@@ -1,19 +1,20 @@
 {
-  "name": "n8n-nodes-<...>",
+  "name": "n8n-nodes-markitdown",
   "version": "0.1.0",
-  "description": "",
+  "description": "n8n node to process files with Markitdown",
   "keywords": [
-    "n8n-community-node-package"
+    "n8n-community-node-package",
+    "markitdown"
   ],
   "license": "MIT",
-  "homepage": "",
+  "homepage": "https://github.com/EmilK15/markitdown.git",
   "author": {
-    "name": "",
-    "email": ""
+    "name": "Emil Kais",
+    "email": "emil@bitovi.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/<...>/n8n-nodes-<...>.git"
+    "url": "https://github.com/EmilK15/markitdown.git"
   },
   "engines": {
     "node": ">=18.10",
@@ -35,13 +36,9 @@
   ],
   "n8n": {
     "n8nNodesApiVersion": 1,
-    "credentials": [
-      "dist/credentials/ExampleCredentialsApi.credentials.js",
-      "dist/credentials/HttpBinApi.credentials.js"
-    ],
+    "credentials": [],
     "nodes": [
-      "dist/nodes/ExampleNode/ExampleNode.node.js",
-      "dist/nodes/HttpBin/HttpBin.node.js"
+      "dist/nodes/Markitdown/Markitdown.node.js"
     ]
   },
   "devDependencies": {
@@ -49,10 +46,14 @@
     "eslint": "^8.56.0",
     "eslint-plugin-n8n-nodes-base": "^1.16.1",
     "gulp": "^4.0.2",
+    "n8n-core": "^1.14.1",
     "prettier": "^3.3.2",
     "typescript": "^5.5.3"
   },
   "peerDependencies": {
     "n8n-workflow": "*"
+  },
+  "dependencies": {
+    "tmp-promise": "^3.0.3"
   }
 }
