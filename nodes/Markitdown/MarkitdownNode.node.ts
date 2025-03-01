@@ -11,20 +11,17 @@ import { exec } from 'child_process';
 
 export class Markitdown implements INodeType {
 	description: INodeTypeDescription = {
-		// Basic node details will go here
 		displayName: 'Markitdown',
 		name: 'markitdownNode',
 		icon: 'file:microsoft.svg',
 		group: ['transform'],
 		version: 1,
-		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
 		description: 'Convert any file into markdown',
 		defaults: {
 			name: 'Markitdown',
 		},
 		inputs: ['main'],
 		outputs: ['main'],
-		credentials: [],
 		properties: [
       {
         displayName: 'File Path',
