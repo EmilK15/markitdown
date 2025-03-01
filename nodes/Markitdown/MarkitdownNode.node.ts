@@ -14,7 +14,7 @@ export class Markitdown implements INodeType {
 		// Basic node details will go here
 		displayName: 'Markitdown',
 		name: 'markitdownNode',
-		icon: 'file:Markitdown.svg',
+		icon: 'file:microsoft.svg',
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
