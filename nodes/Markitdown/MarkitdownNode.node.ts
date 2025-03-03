@@ -3,7 +3,7 @@ import {
   INodeExecutionData,
   INodeType,
   INodeTypeDescription,
-  NodeOperationError
+  NodeOperationError,
 } from 'n8n-workflow';
 import { promises as fsPromise } from 'fs-extra';
 import { file as tmpFile } from 'tmp-promise';
@@ -20,7 +20,9 @@ export class Markitdown implements INodeType {
 		defaults: {
 			name: 'Markitdown',
 		},
+		// @ts-ignore
 		inputs: ['main'],
+		// @ts-ignore
 		outputs: ['main'],
 		properties: [
       {

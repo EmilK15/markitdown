@@ -1,0 +1,12 @@
+{
+    "node": "n8n-nodes-base.Markitdown",
+    "nodeVersion": "1.0",
+    "codexVersion": "1.0",
+    "categories": ["Custom Nodes"],
+    "resources": {
+        "primaryDocumentation": []
+    },
+    "subcategories": {
+        "Core Nodes": ["Files"]
+    }
+}
