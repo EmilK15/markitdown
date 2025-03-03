@@ -5,7 +5,7 @@ import {
   INodeTypeDescription,
   NodeOperationError
 } from 'n8n-workflow';
-import { writeFile, unlink } from 'fs/promises';
+import { promises as fs } from 'fs';
 import { file as tmpFile } from 'tmp-promise';
 import { exec } from 'child_process';
 
@@ -63,11 +63,11 @@ export class Markitdown implements INodeType {
 
         // Create temporary input file
         const inputTmpFile = await tmpFile();
-        await writeFile(inputTmpFile.path, binaryData);
+        await fs.writeFile(inputTmpFile.path, binaryData);
 
         // Create temporary output file path
         const outputTmpFile = await tmpFile();
-        await unlink(outputTmpFile.path); // We just need the path, not the file
+        await fs.unlink(outputTmpFile.path); // We just need the path, not the file
         const outputPath = `${outputTmpFile.path}.md`;
 
         // Build the markitdown command
@@ -98,7 +98,7 @@ export class Markitdown implements INodeType {
         // Clean up temporary files
         await Promise.all([
           inputTmpFile.cleanup(),
-          unlink(outputPath).catch(() => {}),
+          fs.unlink(outputPath).catch(() => {}),
         ]);
 
       } catch (error) {
