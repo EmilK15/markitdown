@@ -5,7 +5,7 @@ import {
   INodeTypeDescription,
   NodeOperationError
 } from 'n8n-workflow';
-import { promises as fs } from 'fs';
+import { promises as fs } from 'fs-extra';
 import { file as tmpFile } from 'tmp-promise';
 import { exec } from 'child_process';
 
