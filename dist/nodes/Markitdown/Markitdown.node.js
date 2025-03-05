@@ -1,10 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Markitdown = void 0;
-const n8n_workflow_1 = require("n8n-workflow");
 const fs_extra_1 = require("fs-extra");
 const tmp_promise_1 = require("tmp-promise");
 const child_process_1 = require("child_process");
+const util_1 = require("util");
+const execPromise = (0, util_1.promisify)(child_process_1.exec);
 class Markitdown {
     constructor() {
         this.description = {
@@ -39,34 +40,34 @@ class Markitdown {
         };
     }
     async execute() {
-        var _a;
         const items = this.getInputData();
         const returnData = [];
         for (let i = 0; i < items.length; i++) {
             try {
                 const filePathName = this.getNodeParameter('filePathName', i);
                 const outputPropertyName = this.getNodeParameter('outputPropertyName', i);
-                if (!((_a = items[i].binary) === null || _a === void 0 ? void 0 : _a[filePathName])) {
-                    throw new n8n_workflow_1.NodeOperationError(this.getNode(), `No binary data property "${filePathName}" exists on item!`, { itemIndex: i });
-                }
-                const binaryData = Buffer.from(items[i].binary[filePathName].data, 'base64');
-                const inputTmpFile = await (0, tmp_promise_1.file)();
-                await fs_extra_1.promises.writeFile(inputTmpFile.path, binaryData);
-                const outputTmpFile = await (0, tmp_promise_1.file)();
-                await fs_extra_1.promises.unlink(outputTmpFile.path);
-                const outputPath = `${outputTmpFile.path}.md`;
-                const command = `markitdown convert "${inputTmpFile.path}" -o "${outputPath}"`.trim();
-                await child_process_1.exec.__promisify__(command);
-                const outputContent = await fs_extra_1.promises.readFile(outputPath);
+                const binaryData = this.helpers.assertBinaryData(i, filePathName);
+                const inputTmpFile = await (0, tmp_promise_1.file)({
+                    prefix: 'n8n-markitdown-input-',
+                    postfix: binaryData.fileName
+                });
+                await fs_extra_1.promises.writeFile(inputTmpFile.path, Buffer.from(binaryData.data, 'base64'));
+                const outputTmpFile = await (0, tmp_promise_1.file)({
+                    prefix: 'n8n-markitdown-output-',
+                    postfix: '.md'
+                });
+                const command = `markitdown "${inputTmpFile.path}" -o "${outputTmpFile.path}"`.trim();
+                await execPromise(command);
+                const outputContent = await fs_extra_1.promises.readFile(outputTmpFile.path);
                 const newItem = {
-                    json: { ...items[i].json },
-                    binary: { ...items[i].binary },
+                    json: {},
+                    binary: {},
                 };
                 newItem.binary[outputPropertyName] = await this.helpers.prepareBinaryData(outputContent, `${outputPropertyName}.md`, 'text/markdown');
                 returnData.push(newItem);
                 await Promise.all([
                     inputTmpFile.cleanup(),
-                    fs_extra_1.promises.unlink(outputPath).catch(() => { }),
+                    outputTmpFile.cleanup()
                 ]);
             }
             catch (error) {

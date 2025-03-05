@@ -2,12 +2,14 @@ import {
 	IExecuteFunctions,
   INodeExecutionData,
   INodeType,
-  INodeTypeDescription,
-  NodeOperationError,
+  INodeTypeDescription
 } from 'n8n-workflow';
 import { promises as fsPromise } from 'fs-extra';
 import { file as tmpFile } from 'tmp-promise';
 import { exec } from 'child_process';
+import { promisify } from 'util'
+
+const execPromise = promisify(exec);
 
 export class Markitdown implements INodeType {
 	description: INodeTypeDescription = {
@@ -51,40 +53,34 @@ export class Markitdown implements INodeType {
         const filePathName = this.getNodeParameter('filePathName', i) as string;
         const outputPropertyName = this.getNodeParameter('outputPropertyName', i) as string;
 
-        // Check if the input item has the specified binary property
-        if (!items[i].binary?.[filePathName]) {
-          throw new NodeOperationError(
-            this.getNode(),
-            `No binary data property "${filePathName}" exists on item!`,
-            { itemIndex: i },
-          );
-        }
+				const binaryData = this.helpers.assertBinaryData(i, filePathName);
 
-        // Get the binary data
-        const binaryData = Buffer.from(items[i].binary![filePathName].data, 'base64');
+				// Step 2: Write the file to a tmp directory
+				const inputTmpFile = await tmpFile({
+					prefix: 'n8n-markitdown-input-',
+					postfix: binaryData.fileName
+				});
+				await fsPromise.writeFile(inputTmpFile.path, Buffer.from(binaryData.data, 'base64'));
 
-        // Create temporary input file
-        const inputTmpFile = await tmpFile();
-        await fsPromise.writeFile(inputTmpFile.path, binaryData);
-
-        // Create temporary output file path
-        const outputTmpFile = await tmpFile();
-        await fsPromise.unlink(outputTmpFile.path); // We just need the path, not the file
-        const outputPath = `${outputTmpFile.path}.md`;
+				// Step 3: Run markitdown command on the tmp file
+				const outputTmpFile = await tmpFile({
+					prefix: 'n8n-markitdown-output-',
+					postfix: '.md'
+				});
 
         // Build the markitdown command
-        const command = `markitdown convert "${inputTmpFile.path}" -o "${outputPath}"`.trim();
+        const command = `markitdown "${inputTmpFile.path}" -o "${outputTmpFile.path}"`.trim();
 
         // Execute markitdown
-        await exec.__promisify__(command);
+        await execPromise(command);
 
         // Read the output file
-        const outputContent = await fsPromise.readFile(outputPath);
+        const outputContent = await fsPromise.readFile(outputTmpFile.path);
 
         // Prepare the output item
         const newItem: INodeExecutionData = {
-          json: { ...items[i].json },
-          binary: { ...items[i].binary },
+          json: { },
+          binary: { },
         };
 
         // Add output to binary property
@@ -99,7 +95,7 @@ export class Markitdown implements INodeType {
         // Clean up temporary files
         await Promise.all([
           inputTmpFile.cleanup(),
-          fsPromise.unlink(outputPath).catch(() => {}),
+          outputTmpFile.cleanup()
         ]);
 
       } catch (error) {
