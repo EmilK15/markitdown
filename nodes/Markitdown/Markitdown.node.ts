@@ -28,20 +28,13 @@ export class Markitdown implements INodeType {
 		outputs: ['main'],
 		properties: [
       {
-        displayName: 'File Path',
-        name: 'filePathName',
+        displayName: 'Input Binary Field',
+        name: 'inputBinaryField',
         type: 'string',
         default: 'data',
         required: true,
         description: 'Name of the binary property containing the file to process',
-      },
-      {
-        displayName: 'Output Property Name',
-        name: 'outputPropertyName',
-        type: 'string',
-        default: 'data',
-        description: 'Name of output',
-      },
+      }
     ],
 	};
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
@@ -50,10 +43,9 @@ export class Markitdown implements INodeType {
 
     for (let i = 0; i < items.length; i++) {
       try {
-        const filePathName = this.getNodeParameter('filePathName', i) as string;
-        const outputPropertyName = this.getNodeParameter('outputPropertyName', i) as string;
+        const inputBinaryField = this.getNodeParameter('inputBinaryField', i) as string;
 
-				const binaryData = this.helpers.assertBinaryData(i, filePathName);
+				const binaryData = this.helpers.assertBinaryData(i, inputBinaryField);
 
 				// Step 2: Write the file to a tmp directory
 				const inputTmpFile = await tmpFile({
@@ -75,20 +67,15 @@ export class Markitdown implements INodeType {
         await execPromise(command);
 
         // Read the output file
-        const outputContent = await fsPromise.readFile(outputTmpFile.path);
+        const outputContent = await fsPromise.readFile(outputTmpFile.path, 'utf-8');
 
         // Prepare the output item
         const newItem: INodeExecutionData = {
-          json: { },
+          json: {
+						data: outputContent
+					},
           binary: { },
         };
-
-        // Add output to binary property
-        newItem.binary![outputPropertyName] = await this.helpers.prepareBinaryData(
-          outputContent,
-          `${outputPropertyName}.md`,
-          'text/markdown',
-        );
 
         returnData.push(newItem);
 

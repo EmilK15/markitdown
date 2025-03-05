@@ -22,20 +22,13 @@ class Markitdown {
             outputs: ['main'],
             properties: [
                 {
-                    displayName: 'File Path',
-                    name: 'filePathName',
+                    displayName: 'Input Binary Field',
+                    name: 'inputBinaryField',
                     type: 'string',
                     default: 'data',
                     required: true,
                     description: 'Name of the binary property containing the file to process',
-                },
-                {
-                    displayName: 'Output Property Name',
-                    name: 'outputPropertyName',
-                    type: 'string',
-                    default: 'data',
-                    description: 'Name of output',
-                },
+                }
             ],
         };
     }
@@ -44,9 +37,8 @@ class Markitdown {
         const returnData = [];
         for (let i = 0; i < items.length; i++) {
             try {
-                const filePathName = this.getNodeParameter('filePathName', i);
-                const outputPropertyName = this.getNodeParameter('outputPropertyName', i);
-                const binaryData = this.helpers.assertBinaryData(i, filePathName);
+                const inputBinaryField = this.getNodeParameter('inputBinaryField', i);
+                const binaryData = this.helpers.assertBinaryData(i, inputBinaryField);
                 const inputTmpFile = await (0, tmp_promise_1.file)({
                     prefix: 'n8n-markitdown-input-',
                     postfix: binaryData.fileName
@@ -58,12 +50,13 @@ class Markitdown {
                 });
                 const command = `markitdown "${inputTmpFile.path}" -o "${outputTmpFile.path}"`.trim();
                 await execPromise(command);
-                const outputContent = await fs_extra_1.promises.readFile(outputTmpFile.path);
+                const outputContent = await fs_extra_1.promises.readFile(outputTmpFile.path, 'utf-8');
                 const newItem = {
-                    json: {},
+                    json: {
+                        data: outputContent
+                    },
                     binary: {},
                 };
-                newItem.binary[outputPropertyName] = await this.helpers.prepareBinaryData(outputContent, `${outputPropertyName}.md`, 'text/markdown');
                 returnData.push(newItem);
                 await Promise.all([
                     inputTmpFile.cleanup(),
