@@ -12,7 +12,7 @@ import { exec } from 'child_process';
 export class Markitdown implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Markitdown',
-		name: 'markitdownNode',
+		name: 'markitdown',
 		icon: 'file:microsoft.svg',
 		group: ['transform'],
 		version: 1,

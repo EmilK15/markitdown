@@ -9,7 +9,7 @@ class Markitdown {
     constructor() {
         this.description = {
             displayName: 'Markitdown',
-            name: 'markitdownNode',
+            name: 'markitdown',
             icon: 'file:microsoft.svg',
             group: ['transform'],
             version: 1,
@@ -85,4 +85,4 @@ class Markitdown {
     }
 }
 exports.Markitdown = Markitdown;
-//# sourceMappingURL=MarkitdownNode.node.js.map
+//# sourceMappingURL=Markitdown.node.js.map

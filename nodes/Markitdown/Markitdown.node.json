@@ -3,9 +3,7 @@
 	"nodeVersion": "1.0",
 	"codexVersion": "1.0",
 	"categories": ["Custom Nodes"],
-	"resources": {
-		"primaryDocumentation": []
-	},
+	"resources": {},
 	"subcategories": {
 		"Core Nodes": ["Files"]
 	}
